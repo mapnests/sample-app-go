@@ -6,6 +6,37 @@ This is a **sample Go application** that demonstrates how to use the [Mapnests G
 - ✅ Reverse (Reverse Geocode)
 - ✅ Distance Matrix
 - ✅ Distance Matrix Details
+- ✅ Autocomplete
+- ✅ Autocomplete Without Zone
+
+---
+
+## API Registration & Authentication
+
+### Step 1: Register for API Access
+
+**Endpoint:** `https://mapnests.com/sign-up`
+
+- Create an account and register for API access.
+
+### Step 2: Login to Dashboard
+
+**Endpoint:** `https://mapnests.com/sign-in`
+
+- Use your credentials to log in and manage your projects.
+
+## Project Setup
+
+### Step 1: Create a Project
+
+1. Log in to the TNMaps Dashboard.
+2. Navigate to the dashboard.
+3. Go to the **Projects** section.
+4. Click on **"Create Project"**.
+5. Provide a **Project Name** and **Project Description**.
+6. After project creation, go to the **details section**.
+7. In the **Web Section**, add your **Package Name**.
+8. Once successfully created, you will receive an **API Key**.
 
 ---
 
@@ -27,7 +58,7 @@ sdk := mapnests.NewClient("YOUR_API_KEY", "PACKAGE_NAME")
 
 ## 📦 Requirements
 
-- Go ≥ 1.18
+- Go ≥ 1.24.2
 - Your API key and package identifier
 
 ---
