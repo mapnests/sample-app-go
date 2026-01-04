@@ -6,8 +6,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	mapnests "github.com/mapnests/sdk-go"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -23,17 +24,14 @@ func main() {
 		log.Fatal("Api key or Package name is empty")
 	}
 
-	mapClient := mapnests.NewClient(
-		apiKey,
-		pkgName,
-	)
+	mapClient := mapnests.NewClient(apiKey,pkgName,3000)
 
 	ctx := context.Background()
 
 	// Search
 	fmt.Println("\n📍 Testing Search...")
 	searchRes, err := mapClient.Search(ctx, mapnests.SearchRequest{
-		Query: "Uttara Sector 3, Dhaka",
+		Query: "Uttara, Dhaka",
 	})
 	if err != nil {
 		log.Fatal("❌ Search error:", err)
@@ -65,17 +63,32 @@ func main() {
 	}
 	fmt.Println("✅ DistanceMatrix result:\n", *distanceRes)
 
-	// Distance Matrix Details
-	fmt.Println("\n📍 Testing DistanceMatrixDetails...")
-	detailsRes, err := mapClient.DistanceMatrixDetails(ctx, mapnests.DistanceMatrixDetailsRequest{
-		OriginLat: 23.8103,
-		OriginLon: 90.4125,
-		DestLat:   22.3475,
-		DestLon:   91.8123,
-		Mode:      mapnests.TravelModeBicycling,
+	
+	//Autocomplete
+	limit:= int64(1) 
+	lat:=   22.8029  
+	lon:=  	92.5908
+
+	autocompleteRes, err := mapClient.Autocomplete(ctx, mapnests.AutoCompleteRequest{
+		Query: "Uttara, Dhaka",
+		Lat: &lat, //optional
+		Lon: &lon, //optional
+		Limit: &limit,	//optional
 	})
 	if err != nil {
-		log.Fatal("❌ DistanceMatrixDetails error:", err)
+		log.Fatal("❌ Auto Complete Response error:", err)
 	}
-	fmt.Println("✅ DistanceMatrixDetails result:\n", *detailsRes)
+	fmt.Println("✅ Auto Complete Response result:\n", *autocompleteRes)
+
+	//Autocomplete Without Zone
+	
+	autocompleteWithOutZoneRes, err := mapClient.AutocompleteWithoutZone(ctx, mapnests.AutoCompleteRequest{
+		Query: "Uttara, Dhaka",
+		
+	})
+	if err != nil {
+		log.Fatal("❌ Auto Complete  Without Zone Response error:", err)
+	}
+	fmt.Println("✅ Auto Complete Without Zone Response result:\n", *autocompleteWithOutZoneRes)
+
 }
