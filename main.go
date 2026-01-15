@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -65,30 +66,24 @@ func main() {
 
 	
 	//Autocomplete
-	limit:= int64(1) 
-	lat:=   22.8029  
-	lon:=  	92.5908
-
 	autocompleteRes, err := mapClient.Autocomplete(ctx, mapnests.AutoCompleteRequest{
 		Query: "Uttara, Dhaka",
-		Lat: &lat, //optional
-		Lon: &lon, //optional
-		Limit: &limit,	//optional
 	})
 	if err != nil {
 		log.Fatal("❌ Auto Complete Response error:", err)
 	}
-	fmt.Println("✅ Auto Complete Response result:\n", *autocompleteRes)
+	autocompleteResJSON, _ := json.MarshalIndent(autocompleteRes, "", "  ")
+	fmt.Println("✅ Auto Complete Response result:\n" + string(autocompleteResJSON))
 
-	//Autocomplete Without Zone
 	
+	//Autocomplete Without Zone
 	autocompleteWithOutZoneRes, err := mapClient.AutocompleteWithoutZone(ctx, mapnests.AutoCompleteRequest{
 		Query: "Uttara, Dhaka",
-		
 	})
 	if err != nil {
 		log.Fatal("❌ Auto Complete  Without Zone Response error:", err)
 	}
-	fmt.Println("✅ Auto Complete Without Zone Response result:\n", *autocompleteWithOutZoneRes)
+	autocompleteWithOutZoneResJSON, _ := json.MarshalIndent(autocompleteWithOutZoneRes, "", "  ")
+	fmt.Println("✅ Auto Complete Without Zone Response result:\n" + string(autocompleteWithOutZoneResJSON))
 
 }
