@@ -64,7 +64,23 @@ func main() {
 	}
 	fmt.Println("✅ DistanceMatrix result:\n", *distanceRes)
 
-	
+	// Distance Matrix Details
+	fmt.Println("\n📍 Testing Distance Matrix Details...")
+	distanceDetailsRes, err := mapClient.DistanceMatrixDetails(ctx, mapnests.DistanceMatrixDetailsRequest{
+		OriginLat	: 23.7806,
+    	OriginLon	: 90.3984,
+    	DestLat		: 23.774,
+    	DestLon		: 90.3681,
+		Mode:      mapnests.TravelModeCar,
+	})
+	if err != nil {
+		log.Fatal("❌ Distance Matrix Details error:", err)
+	}
+	distanceDetailsResJSON, _ := json.MarshalIndent(distanceDetailsRes, "", "  ")
+	fmt.Println("✅ Distance Matrix Details result:\n", string(distanceDetailsResJSON))
+
+
+
 	//Autocomplete
 	autocompleteRes, err := mapClient.Autocomplete(ctx, mapnests.AutoCompleteRequest{
 		Query: "Uttara, Dhaka",
