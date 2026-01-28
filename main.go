@@ -39,6 +39,19 @@ func main() {
 	}
 	fmt.Println("✅ Search result:\n", *searchRes)
 
+	// Search by Radius
+	fmt.Println("\n📍 Testing Search by Radius...")
+	searchByRadiusRes, err := mapClient.SearchByRadius(ctx, mapnests.SearchByRadiusRequest{
+		Query: "Uttara, Dhaka",
+		Radius: 1000,
+		Lat: 23.8766874,
+		Lon: 90.3576884,
+	})
+	if err != nil {
+		log.Fatal("❌ Search by Radius error:", err)
+	}
+	fmt.Println("✅ Search result:\n", *searchByRadiusRes)
+
 	// Reverse
 	fmt.Println("\n📍 Testing Reverse...")
 	revRes, err := mapClient.Reverse(ctx, mapnests.ReverseRequest{
@@ -76,10 +89,7 @@ func main() {
 	if err != nil {
 		log.Fatal("❌ Distance Matrix Details error:", err)
 	}
-	distanceDetailsResJSON, _ := json.MarshalIndent(distanceDetailsRes, "", "  ")
-	fmt.Println("✅ Distance Matrix Details result:\n", string(distanceDetailsResJSON))
-
-
+	fmt.Println("✅ Distance Matrix Details result:\n", distanceDetailsRes)
 
 	//Autocomplete
 	autocompleteRes, err := mapClient.Autocomplete(ctx, mapnests.AutoCompleteRequest{
@@ -90,7 +100,6 @@ func main() {
 	}
 	autocompleteResJSON, _ := json.MarshalIndent(autocompleteRes, "", "  ")
 	fmt.Println("✅ Auto Complete Response result:\n" + string(autocompleteResJSON))
-
 	
 	//Autocomplete Without Zone
 	autocompleteWithOutZoneRes, err := mapClient.AutocompleteWithoutZone(ctx, mapnests.AutoCompleteRequest{
