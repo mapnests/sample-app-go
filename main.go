@@ -111,4 +111,14 @@ func main() {
 	autocompleteWithOutZoneResJSON, _ := json.MarshalIndent(autocompleteWithOutZoneRes, "", "  ")
 	fmt.Println("✅ Auto Complete Without Zone Response result:\n" + string(autocompleteWithOutZoneResJSON))
 
+	// Details Search By PlaceID
+	placeDetailsRes, err := mapClient.DetailsByPlaceID(ctx, mapnests.DetailsByPlaceIDRequest{
+		PlaceID: "4355aad6b8eb0b4f0ee3fa972ff9ac3fdc2d7f86f634d81f79dcf396f21826a0",
+	})
+	if err != nil {
+		log.Fatal("❌ Place Details Response error:", err)
+	}
+	placeDetailsResJSON, _ := json.MarshalIndent(placeDetailsRes, "", "  ")
+	fmt.Println("✅ Place Details Response result:\n" + string(placeDetailsResJSON))
+
 }
