@@ -8,6 +8,10 @@ This is a **sample Go application** that demonstrates how to use the [Mapnests G
 - ✅ Distance Matrix Details
 - ✅ Autocomplete
 - ✅ Autocomplete Without Zone
+- ✅ Search By Radius
+- ✅ Detailed Search By PlaceId
+- ✅ Pairwise Route Summary
+- ✅ Multi Source Route Summary
 
 ---
 

@@ -29,40 +29,6 @@ func main() {
 
 	ctx := context.Background()
 
-	// Search
-	fmt.Println("\n📍 Testing Search...")
-	searchRes, err := mapClient.Search(ctx, mapnests.SearchRequest{
-		Query: "Uttara, Dhaka",
-	})
-	if err != nil {
-		log.Fatal("❌ Search error:", err)
-	}
-	fmt.Println("✅ Search result:\n", *searchRes)
-
-	// Search by Radius
-	fmt.Println("\n📍 Testing Search by Radius...")
-	searchByRadiusRes, err := mapClient.SearchByRadius(ctx, mapnests.SearchByRadiusRequest{
-		Query: "Uttara, Dhaka",
-		Radius: 1000,
-		Lat: 23.8766874,
-		Lon: 90.3576884,
-	})
-	if err != nil {
-		log.Fatal("❌ Search by Radius error:", err)
-	}
-	fmt.Println("✅ Search result:\n", *searchByRadiusRes)
-
-	// Reverse
-	fmt.Println("\n📍 Testing Reverse...")
-	revRes, err := mapClient.Reverse(ctx, mapnests.ReverseRequest{
-		Lat: 23.805675432193333,
-		Lon: 90.42062140436256,
-	})
-	if err != nil {
-		log.Fatal("❌ ReverseGeocode error:", err)
-	}
-	fmt.Println("✅ ReverseGeocode result:\n", revRes)
-
 	// Distance Matrix
 	fmt.Println("\n📍 Testing DistanceMatrix...")
 	distanceRes, err := mapClient.DistanceMatrix(ctx, mapnests.DistanceMatrixRequest{
@@ -91,6 +57,62 @@ func main() {
 	}
 	fmt.Println("✅ Distance Matrix Details result:\n", distanceDetailsRes)
 
+	//Pairwise Route Summary
+	fmt.Println("\n📍 Testing PairWiseRouteSummary...")
+	pairwiseRes, err := mapClient.PairWiseRouteSummary(ctx, mapnests.PairWiseRouteSummaryRequest{
+		Pairs: []mapnests.PairWiseRoute{
+			{ID: 1, Src: mapnests.Coordinate{Lat: 23.8113, Lon: 90.4135}, Dest: mapnests.Coordinate{Lat: 23.7815, Lon: 90.4123}, Mode: mapnests.TravelModeBicycling},
+			{ID: 2, Src: mapnests.Coordinate{Lat: 23.8123, Lon: 90.4145}, Dest: mapnests.Coordinate{Lat: 23.7825, Lon: 90.4133}, Mode: mapnests.TravelModeBicycling},
+			{ID: 3, Src: mapnests.Coordinate{Lat: 23.8133, Lon: 90.4155}, Dest: mapnests.Coordinate{Lat: 23.7835, Lon: 90.4143}, Mode: mapnests.TravelModeBicycling},
+		},
+	})
+	if err != nil {
+		log.Fatal("PairwiseRouteSummary error:", err)
+	}
+	fmt.Println("PairwiseRouteSummary result:", *pairwiseRes)
+	pairwiseResJSON, _ := json.MarshalIndent(pairwiseRes, "", "  ")
+	fmt.Println("✅ Pairwise Route Summary Response result:\n" + string(pairwiseResJSON))
+
+	// Multi Source Route Summary
+	fmt.Println("\n📍 Testing MultiSourceRouteSummary...")
+	multiRes, err := mapClient.MultiSourceRouteSummary(ctx, mapnests.MultiSourceRouteSummaryRequest{
+		Sources: []mapnests.Source{
+			{ID: 1, Lat: 23.7805733, Lon: 90.2792399, Mode: string(mapnests.TravelModeCar)},
+			{ID: 2, Lat: 23.75, Lon: 90.36, Mode: string(mapnests.TravelModeCar)},
+			{ID: 3, Lat: 23.7, Lon: 90.42, Mode: string(mapnests.TravelModeCar)},
+			{ID: 4, Lat: 23.7654321, Lon: 90.3456789, Mode: string(mapnests.TravelModeCar)},
+			{ID: 5, Lat: 23.7123456, Lon: 90.3765432, Mode: string(mapnests.TravelModeCar)},
+		},
+		Destination: mapnests.Destination{Lat: 23.810332, Lon: 90.412518},
+	})
+	if err != nil {
+		log.Fatal("MultiSourceRouteSummary error:", err)
+	}
+	multiResJSON, _ := json.MarshalIndent(multiRes, "", "  ")
+	fmt.Println("✅ MultiSourceRouteSummary Response result:\n" + string(multiResJSON))
+
+	// Search
+	fmt.Println("\n📍 Testing Search...")
+	searchRes, err := mapClient.Search(ctx, mapnests.SearchRequest{
+		Query: "Uttara, Dhaka",
+	})
+	if err != nil {
+		log.Fatal("❌ Search error:", err)
+	}
+	fmt.Println("✅ Search result:\n", *searchRes)
+
+	// Reverse
+	fmt.Println("\n📍 Testing Reverse...")
+	revRes, err := mapClient.Reverse(ctx, mapnests.ReverseRequest{
+		Lat: 23.805675432193333,
+		Lon: 90.42062140436256,
+	})
+	if err != nil {
+		log.Fatal("❌ Reverse Geocode error:", err)
+	}
+	revResJSON, _ := json.MarshalIndent(revRes, "", "  ")
+	fmt.Println("✅ Reverse Geocode Response result:\n" + string(revResJSON))
+
 	//Autocomplete
 	autocompleteRes, err := mapClient.Autocomplete(ctx, mapnests.AutoCompleteRequest{
 		Query: "Uttara, Dhaka",
@@ -110,6 +132,19 @@ func main() {
 	}
 	autocompleteWithOutZoneResJSON, _ := json.MarshalIndent(autocompleteWithOutZoneRes, "", "  ")
 	fmt.Println("✅ Auto Complete Without Zone Response result:\n" + string(autocompleteWithOutZoneResJSON))
+
+	// Search by Radius
+	fmt.Println("\n📍 Testing Search by Radius...")
+	searchByRadiusRes, err := mapClient.SearchByRadius(ctx, mapnests.SearchByRadiusRequest{
+		Query: "Uttara, Dhaka",
+		Radius: 1000,
+		Lat: 23.8766874,
+		Lon: 90.3576884,
+	})
+	if err != nil {
+		log.Fatal("❌ Search by Radius error:", err)
+	}
+	fmt.Println("✅ Search result:\n", *searchByRadiusRes)
 
 	// Details Search By PlaceID
 	placeDetailsRes, err := mapClient.DetailsByPlaceID(ctx, mapnests.DetailsByPlaceIDRequest{

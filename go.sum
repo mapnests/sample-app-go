@@ -1,4 +1,4 @@
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
-github.com/mapnests/sdk-go v1.11.4 h1:6MT1qyq8WjS7ebg0mLF7y7e7xRA9aT0Ffu8gG5+/mU8=
-github.com/mapnests/sdk-go v1.11.4/go.mod h1:Cv8Lq1jbOKcB9nheyq7P1Df7qND99XYu2MjFFs8pZDI=
+github.com/mapnests/sdk-go v1.11.5 h1:uEe6ZLcSkCcwDTZhWXokCIDpeEntALXjijMQiXW8jJw=
+github.com/mapnests/sdk-go v1.11.5/go.mod h1:Cv8Lq1jbOKcB9nheyq7P1Df7qND99XYu2MjFFs8pZDI=
