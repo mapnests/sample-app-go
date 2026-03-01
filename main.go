@@ -114,24 +114,18 @@ func main() {
 	fmt.Println("✅ Reverse Geocode Response result:\n" + string(revResJSON))
 
 	//Autocomplete
+	var limit int64 = 1
+	var activeZone bool = false
 	autocompleteRes, err := mapClient.Autocomplete(ctx, mapnests.AutoCompleteRequest{
-		Query: "Uttara, Dhaka",
+		Query: "Mirpur",
+		ActiveZone: &activeZone,
+		Limit: &limit,
 	})
 	if err != nil {
 		log.Fatal("❌ Auto Complete Response error:", err)
 	}
 	autocompleteResJSON, _ := json.MarshalIndent(autocompleteRes, "", "  ")
 	fmt.Println("✅ Auto Complete Response result:\n" + string(autocompleteResJSON))
-	
-	//Autocomplete Without Zone
-	autocompleteWithOutZoneRes, err := mapClient.AutocompleteWithoutZone(ctx, mapnests.AutoCompleteRequest{
-		Query: "Uttara, Dhaka",
-	})
-	if err != nil {
-		log.Fatal("❌ Auto Complete  Without Zone Response error:", err)
-	}
-	autocompleteWithOutZoneResJSON, _ := json.MarshalIndent(autocompleteWithOutZoneRes, "", "  ")
-	fmt.Println("✅ Auto Complete Without Zone Response result:\n" + string(autocompleteWithOutZoneResJSON))
 
 	// Search by Radius
 	fmt.Println("\n📍 Testing Search by Radius...")
@@ -148,12 +142,15 @@ func main() {
 
 	// Details Search By PlaceID
 	placeDetailsRes, err := mapClient.DetailsByPlaceID(ctx, mapnests.DetailsByPlaceIDRequest{
-		PlaceID: "4355aad6b8eb0b4f0ee3fa972ff9ac3fdc2d7f86f634d81f79dcf396f21826a0",
+		PlaceID: "86645dbb7d0cf3d466fa169d4f66560de61a63aacdc355ee870c16d3b4feb0b2",
 	})
 	if err != nil {
 		log.Fatal("❌ Place Details Response error:", err)
 	}
 	placeDetailsResJSON, _ := json.MarshalIndent(placeDetailsRes, "", "  ")
 	fmt.Println("✅ Place Details Response result:\n" + string(placeDetailsResJSON))
+
+	
+	
 
 }
