@@ -12,6 +12,7 @@ This is a **sample Go application** that demonstrates how to use the [Mapnests G
 - ✅ Detailed Search By PlaceId
 - ✅ Pairwise Route Summary
 - ✅ Multi Source Route Summary
+- ✅ Snap to Road 
 
 ---
 
