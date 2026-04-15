@@ -150,7 +150,17 @@ func main() {
 	placeDetailsResJSON, _ := json.MarshalIndent(placeDetailsRes, "", "  ")
 	fmt.Println("✅ Place Details Response result:\n" + string(placeDetailsResJSON))
 
-	
-	
-
+	// Snap To Road
+	fmt.Println("\n📍 Testing Snap To Road...")
+	snapToRoadRes, err := mapClient.SnapToRoad(ctx, mapnests.SnapToRoadRequest{
+		Mode: "walking",
+		Latitude: 23.8103,
+		Longitude: 90.4125,
+		},
+	)
+	if err != nil {
+		log.Fatal("❌ Snap To Road error:", err)
+	}
+	snapToRoadResJSON, _ := json.MarshalIndent(snapToRoadRes, "", "  ")
+	fmt.Println("✅ Snap To Road Response result:\n" + string(snapToRoadResJSON))
 }
