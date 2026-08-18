@@ -25,7 +25,7 @@ func main() {
 		log.Fatal("Api key or Package name is empty")
 	}
 
-	mapClient := mapnests.NewClient(apiKey,pkgName,3000)
+	mapClient := mapnests.NewClient(apiKey,pkgName)
 
 	ctx := context.Background()
 
@@ -75,18 +75,20 @@ func main() {
 
 	// Multi Source Route Summary
 	fmt.Println("\n📍 Testing MultiSourceRouteSummary...")
+	
 	multiRes, err := mapClient.MultiSourceRouteSummary(ctx, mapnests.MultiSourceRouteSummaryRequest{
 		Sources: []mapnests.Source{
 			{ID: 1, Lat: 23.7805733, Lon: 90.2792399, Mode: string(mapnests.TravelModeCar)},
 			{ID: 2, Lat: 23.75, Lon: 90.36, Mode: string(mapnests.TravelModeCar)},
-			{ID: 3, Lat: 23.7, Lon: 90.42, Mode: string(mapnests.TravelModeCar)},
-			{ID: 4, Lat: 23.7654321, Lon: 90.3456789, Mode: string(mapnests.TravelModeCar)},
-			{ID: 5, Lat: 23.7123456, Lon: 90.3765432, Mode: string(mapnests.TravelModeCar)},
+			// {ID: 3, Lat: 23.7, Lon: 90.42, Mode: string(mapnests.TravelModeCar)},
+			// {ID: 4, Lat: 23.7654321, Lon: 90.3456789, Mode: string(mapnests.TravelModeCar)},
+			// {ID: 5, Lat: 23.7123456, Lon: 90.3765432, Mode: string(mapnests.TravelModeCar)},
 		},
 		Destination: mapnests.Destination{Lat: 23.810332, Lon: 90.412518},
+		
 	})
 	if err != nil {
-		log.Fatal("MultiSourceRouteSummary error:", err)
+		log.Fatal(err)
 	}
 	multiResJSON, _ := json.MarshalIndent(multiRes, "", "  ")
 	fmt.Println("✅ MultiSourceRouteSummary Response result:\n" + string(multiResJSON))
@@ -163,4 +165,22 @@ func main() {
 	}
 	snapToRoadResJSON, _ := json.MarshalIndent(snapToRoadRes, "", "  ")
 	fmt.Println("✅ Snap To Road Response result:\n" + string(snapToRoadResJSON))
+
+	// Multi Stop Route Summary
+	fmt.Println("\n📍 Testing MultiStopPoints...")
+	// var requestId string = "1asdas23456asdas789"
+	multiStopRes, err := mapClient.MultiStopPoints(ctx, mapnests.MultiStopPointsRequest{
+		Src: mapnests.Coordinate{Lat: 23.809973415982903, Lon: 90.35697149649764},
+		StopPoints: []mapnests.StopPoint{
+			{ID: 1, Lat: 23.81038738311683, Lon: 90.36203008256733},
+			{ID: 2, Lat: 23.798308134287165, Lon: 90.43522641639149},
+		},
+		Mode: mapnests.TravelModeBicycling,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	multiStopResJSON, _ := json.MarshalIndent(multiStopRes, "", "  ")
+	fmt.Println("✅ MultiStopPoints Response result:\n" + string(multiStopResJSON))
+
 }
