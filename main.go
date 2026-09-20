@@ -12,6 +12,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type apiCall func(ctx context.Context, client mapnests.Client) error
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -25,13 +27,40 @@ func main() {
 		log.Fatal("Api key or Package name is empty")
 	}
 
-	mapClient := mapnests.NewClient(apiKey,pkgName)
+	mapClient := mapnests.NewClient(apiKey, pkgName)
 
 	ctx := context.Background()
 
-	// Distance Matrix
-	fmt.Println("\n📍 Testing DistanceMatrix...")
-	distanceRes, err := mapClient.DistanceMatrix(ctx, mapnests.DistanceMatrixRequest{
+	// Comment/uncomment the lines below to choose which calls to run.
+	run(ctx, mapClient, "DistanceMatrix", distanceMatrixCall)
+	run(ctx, mapClient, "DistanceMatrixDetails", distanceMatrixDetailsCall)
+	run(ctx, mapClient, "PairwiseRouteSummary", pairwiseRouteSummaryCall)
+	run(ctx, mapClient, "MultiSourceRouteSummary", multiSourceRouteSummaryCall)
+	run(ctx, mapClient, "Search", searchCall)
+	run(ctx, mapClient, "Geocode", geocodeCall)
+	run(ctx, mapClient, "Reverse Geocode", reverseCall)
+	run(ctx, mapClient, "Autocomplete", autocompleteCall)
+	run(ctx, mapClient, "Search By Radius", searchByRadiusCall)
+	run(ctx, mapClient, "Details by Place ID", detailsByPlaceIDCall)
+	run(ctx, mapClient, "Snap to Road", snapToRoadCall)
+	run(ctx, mapClient, "MultiStopPoint", multiStopPointCall)
+	run(ctx, mapClient, "MultiSourceRouteSummaryWithoutGeometry", multiSourceRouteSummaryWithoutGeometryCall)
+	run(ctx, mapClient, "ETA Without Geometry By Modes", etaWithoutGeometryByModesCall)
+	run(ctx, mapClient, "ETA With Geometry By Modes", etaWithGeometryByModesCall)
+	run(ctx, mapClient, "ETA With Geometry", etaWithGeometryCall)
+	run(ctx, mapClient, "ETA Multi Stoppage", etaMultipleStoppageCall)
+}
+
+// run prints a header for the named call, executes it, and exits on error.
+func run(ctx context.Context, client mapnests.Client, name string, call apiCall) {
+	fmt.Printf("\n📍 Testing %s...\n", name)
+	if err := call(ctx, client); err != nil {
+		log.Fatalf("❌ %s error: %v", name, err)
+	}
+}
+
+func distanceMatrixCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.DistanceMatrix(ctx, mapnests.DistanceMatrixRequest{
 		OriginLat: 23.8103, // Dhaka
 		OriginLon: 90.4125,
 		DestLat:   23.8029, // Chattogram
@@ -39,27 +68,29 @@ func main() {
 		Mode:      mapnests.TravelModeCar,
 	})
 	if err != nil {
-		log.Fatal("❌ DistanceMatrix error:", err)
+		return err
 	}
-	fmt.Println("✅ DistanceMatrix result:\n", *distanceRes)
+	fmt.Println("✅ DistanceMatrix result:\n", *res)
+	return nil
+}
 
-	// Distance Matrix Details
-	fmt.Println("\n📍 Testing Distance Matrix Details...")
-	distanceDetailsRes, err := mapClient.DistanceMatrixDetails(ctx, mapnests.DistanceMatrixDetailsRequest{
-		OriginLat	: 23.7806,
-    	OriginLon	: 90.3984,
-    	DestLat		: 23.774,
-    	DestLon		: 90.3681,
+func distanceMatrixDetailsCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.DistanceMatrixDetails(ctx, mapnests.DistanceMatrixDetailsRequest{
+		OriginLat: 23.7806,
+		OriginLon: 90.3984,
+		DestLat:   23.774,
+		DestLon:   90.3681,
 		Mode:      mapnests.TravelModeCar,
 	})
 	if err != nil {
-		log.Fatal("❌ Distance Matrix Details error:", err)
+		return err
 	}
-	fmt.Println("✅ Distance Matrix Details result:\n", distanceDetailsRes)
+	fmt.Println("✅ Distance Matrix Details result:\n", res)
+	return nil
+}
 
-	//Pairwise Route Summary
-	fmt.Println("\n📍 Testing PairWiseRouteSummary...")
-	pairwiseRes, err := mapClient.PairWiseRouteSummary(ctx, mapnests.PairWiseRouteSummaryRequest{
+func pairwiseRouteSummaryCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.PairWiseRouteSummary(ctx, mapnests.PairWiseRouteSummaryRequest{
 		Pairs: []mapnests.PairWiseRoute{
 			{ID: 1, Src: mapnests.Coordinate{Lat: 23.8113, Lon: 90.4135}, Dest: mapnests.Coordinate{Lat: 23.7815, Lon: 90.4123}, Mode: mapnests.TravelModeBicycling},
 			{ID: 2, Src: mapnests.Coordinate{Lat: 23.8123, Lon: 90.4145}, Dest: mapnests.Coordinate{Lat: 23.7825, Lon: 90.4133}, Mode: mapnests.TravelModeBicycling},
@@ -67,120 +98,235 @@ func main() {
 		},
 	})
 	if err != nil {
-		log.Fatal("PairwiseRouteSummary error:", err)
+		return err
 	}
-	fmt.Println("PairwiseRouteSummary result:", *pairwiseRes)
-	pairwiseResJSON, _ := json.MarshalIndent(pairwiseRes, "", "  ")
-	fmt.Println("✅ Pairwise Route Summary Response result:\n" + string(pairwiseResJSON))
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ Pairwise Route Summary Response result:\n" + string(resJSON))
+	return nil
+}
 
-	// Multi Source Route Summary
-	fmt.Println("\n📍 Testing MultiSourceRouteSummary...")
-	
-	multiRes, err := mapClient.MultiSourceRouteSummary(ctx, mapnests.MultiSourceRouteSummaryRequest{
+func multiSourceRouteSummaryCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.MultiSourceRouteSummary(ctx, mapnests.MultiSourceRouteSummaryRequest{
 		Sources: []mapnests.Source{
 			{ID: 1, Lat: 23.7805733, Lon: 90.2792399, Mode: string(mapnests.TravelModeCar)},
 			{ID: 2, Lat: 23.75, Lon: 90.36, Mode: string(mapnests.TravelModeCar)},
-			// {ID: 3, Lat: 23.7, Lon: 90.42, Mode: string(mapnests.TravelModeCar)},
-			// {ID: 4, Lat: 23.7654321, Lon: 90.3456789, Mode: string(mapnests.TravelModeCar)},
-			// {ID: 5, Lat: 23.7123456, Lon: 90.3765432, Mode: string(mapnests.TravelModeCar)},
 		},
 		Destination: mapnests.Destination{Lat: 23.810332, Lon: 90.412518},
-		
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	multiResJSON, _ := json.MarshalIndent(multiRes, "", "  ")
-	fmt.Println("✅ MultiSourceRouteSummary Response result:\n" + string(multiResJSON))
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ MultiSourceRouteSummary Response result:\n" + string(resJSON))
+	return nil
+}
 
-	// Search
-	fmt.Println("\n📍 Testing Search...")
-	searchRes, err := mapClient.Search(ctx, mapnests.SearchRequest{
+func searchCall(ctx context.Context, client mapnests.Client) error {
+	var limit int64 = 5
+	res, err := client.Search(ctx, mapnests.SearchRequest{
 		Query: "Uttara, Dhaka",
+		Limit: &limit,
 	})
 	if err != nil {
-		log.Fatal("❌ Search error:", err)
+		return err
 	}
-	fmt.Println("✅ Search result:\n", *searchRes)
+	fmt.Println("✅ Search result:\n", *res)
+	return nil
+}
 
-	// Reverse
-	fmt.Println("\n📍 Testing Reverse...")
-	revRes, err := mapClient.Reverse(ctx, mapnests.ReverseRequest{
+func geocodeCall(ctx context.Context, client mapnests.Client) error {
+	var limit int64 = 5
+	res, err := client.Geocode(ctx, mapnests.GeocodeRequest{
+		Query: "Uttara, Dhaka",
+		Limit: &limit,
+	})
+	if err != nil {
+		return err
+	}
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ Geocode Response result:\n" + string(resJSON))
+	return nil
+}
+
+func reverseCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.Reverse(ctx, mapnests.ReverseRequest{
 		Lat: 23.805675432193333,
 		Lon: 90.42062140436256,
 	})
 	if err != nil {
-		log.Fatal("❌ Reverse Geocode error:", err)
+		return err
 	}
-	revResJSON, _ := json.MarshalIndent(revRes, "", "  ")
-	fmt.Println("✅ Reverse Geocode Response result:\n" + string(revResJSON))
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ Reverse Geocode Response result:\n" + string(resJSON))
+	return nil
+}
 
-	//Autocomplete
+func autocompleteCall(ctx context.Context, client mapnests.Client) error {
 	var limit int64 = 1
 	var activeZone bool = false
-	autocompleteRes, err := mapClient.Autocomplete(ctx, mapnests.AutoCompleteRequest{
-		Query: "Mirpur",
+	res, err := client.Autocomplete(ctx, mapnests.AutoCompleteRequest{
+		Query:      "Mirpur",
 		ActiveZone: &activeZone,
-		Limit: &limit,
+		Limit:      &limit,
 	})
 	if err != nil {
-		log.Fatal("❌ Auto Complete Response error:", err)
+		return err
 	}
-	autocompleteResJSON, _ := json.MarshalIndent(autocompleteRes, "", "  ")
-	fmt.Println("✅ Auto Complete Response result:\n" + string(autocompleteResJSON))
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ Auto Complete Response result:\n" + string(resJSON))
+	return nil
+}
 
-	// Search by Radius
-	fmt.Println("\n📍 Testing Search by Radius...")
-	searchByRadiusRes, err := mapClient.SearchByRadius(ctx, mapnests.SearchByRadiusRequest{
-		Query: "Uttara, Dhaka",
+func searchByRadiusCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.SearchByRadius(ctx, mapnests.SearchByRadiusRequest{
+		Query:  "Uttara, Dhaka",
 		Radius: 1000,
-		Lat: 23.8766874,
-		Lon: 90.3576884,
+		Lat:    23.8766874,
+		Lon:    90.3576884,
 	})
 	if err != nil {
-		log.Fatal("❌ Search by Radius error:", err)
+		return err
 	}
-	fmt.Println("✅ Search result:\n", *searchByRadiusRes)
+	fmt.Println("✅ Search result:\n", *res)
+	return nil
+}
 
-	// Details Search By PlaceID
-	placeDetailsRes, err := mapClient.DetailsByPlaceID(ctx, mapnests.DetailsByPlaceIDRequest{
-		PlaceID: "86645dbb7d0cf3d466fa169d4f66560de61a63aacdc355ee870c16d3b4feb0b2",
+func detailsByPlaceIDCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.DetailsByPlaceID(ctx, mapnests.DetailsByPlaceIDRequest{
+		PlaceID: "5f50dd3902085e86d414427a41559222cdfd4d8169378a50ad6659d250601067",
 	})
 	if err != nil {
-		log.Fatal("❌ Place Details Response error:", err)
+		return err
 	}
-	placeDetailsResJSON, _ := json.MarshalIndent(placeDetailsRes, "", "  ")
-	fmt.Println("✅ Place Details Response result:\n" + string(placeDetailsResJSON))
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ Place Details Response result:\n" + string(resJSON))
+	return nil
+}
 
-	// Snap To Road
-	fmt.Println("\n📍 Testing Snap To Road...")
-	snapToRoadRes, err := mapClient.SnapToRoad(ctx, mapnests.SnapToRoadRequest{
-		Mode: "walking",
-		Latitude: 23.8103,
+func snapToRoadCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.SnapToRoad(ctx, mapnests.SnapToRoadRequest{
+		Mode:      "walking",
+		Latitude:  23.8103,
 		Longitude: 90.4125,
-		},
-	)
+	})
 	if err != nil {
-		log.Fatal("❌ Snap To Road error:", err)
+		return err
 	}
-	snapToRoadResJSON, _ := json.MarshalIndent(snapToRoadRes, "", "  ")
-	fmt.Println("✅ Snap To Road Response result:\n" + string(snapToRoadResJSON))
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ Snap To Road Response result:\n" + string(resJSON))
+	return nil
+}
 
-	// Multi Stop Route Summary
-	fmt.Println("\n📍 Testing MultiStopPoints...")
-	// var requestId string = "1asdas23456asdas789"
-	multiStopRes, err := mapClient.MultiStopPoints(ctx, mapnests.MultiStopPointsRequest{
+func multiStopPointCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.MultiStopPoints(ctx, mapnests.MultiStopPointsRequest{
 		Src: mapnests.Coordinate{Lat: 23.809973415982903, Lon: 90.35697149649764},
 		StopPoints: []mapnests.StopPoint{
 			{ID: 1, Lat: 23.81038738311683, Lon: 90.36203008256733},
 			{ID: 2, Lat: 23.798308134287165, Lon: 90.43522641639149},
 		},
-		Mode: mapnests.TravelModeBicycling,
+		Mode: mapnests.TravelModeMotorcycle,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	multiStopResJSON, _ := json.MarshalIndent(multiStopRes, "", "  ")
-	fmt.Println("✅ MultiStopPoints Response result:\n" + string(multiStopResJSON))
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ MultiStopPoints Response result:\n" + string(resJSON))
+	return nil
+}
 
+func multiSourceRouteSummaryWithoutGeometryCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.MultiSourceRouteSummaryWithoutGeometry(ctx, mapnests.MultiSourceRouteSummaryRequest{
+		Sources: []mapnests.Source{
+			{ID: 1, Lat: 23.7805733, Lon: 90.2792399, Mode: string(mapnests.TravelModeCar)},
+			{ID: 2, Lat: 23.75, Lon: 90.36, Mode: string(mapnests.TravelModeCar)},
+		},
+		Destination: mapnests.Destination{Lat: 23.810332, Lon: 90.412518},
+	})
+	if err != nil {
+		return err
+	}
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ MultiSourceRouteSummary Response Without Geometry result:\n" + string(resJSON))
+	return nil
+}
+
+func etaWithoutGeometryByModesCall(ctx context.Context, client mapnests.Client) error {
+	var numberOfRoutes int64 = 3
+	res, err := client.EtaWithoutGeometryByMode(ctx, mapnests.ETAByModeRequest{
+		FromLat:    23.82440246492232,
+		FromLon:    90.35823219240551,
+		ToLat:      23.77683932043941,
+		ToLon:      90.40510870368077,
+		Mode:       mapnests.TravelModeCar,
+		NoOfRoutes: &numberOfRoutes,
+	})
+	if err != nil {
+		return err
+	}
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ ETA Service Response Without Geometry result:\n" + string(resJSON))
+	return nil
+}
+
+func etaWithGeometryByModesCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.EtaWithGeometryByMode(ctx, mapnests.ETAWithGeometryByModeRequest{
+		FromLat: 23.7805733,
+		FromLon: 90.2792399,
+		ToLat:   23.810332,
+		ToLon:   90.412518,
+		TripId: "550e8400-e29b-41d4-a716-446655440000",
+		Mode:    mapnests.TravelModeCar,
+	})
+	if err != nil {
+		return err
+	}
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ ETA Service Response With Geometry (Single Mode) result:\n" + string(resJSON))
+	return nil
+}
+
+func etaWithGeometryCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.EtaWithGeometry(ctx, mapnests.ETAsRequest{
+		FromLat: 23.759248321873432,
+		FromLon: 90.41691646513276,
+		ToLat:   23.770148309864418,
+		ToLon:   90.40842674496818,
+	})
+	if err != nil {
+		return err
+	}
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ ETA Service Response With Geometry (Multi Mode) result:\n" + string(resJSON))
+	return nil
+}
+
+func etaMultipleStoppageCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.EtaMultiStoppage(ctx, mapnests.ETAMultipleStoppageRequest{
+		Source: mapnests.LatLng{
+			Latitude:  23.8115,
+			Longitude: 90.414,
+		},
+		DropOff: mapnests.LatLng{
+			Latitude:  23.8115,
+			Longitude: 90.414,
+		},
+		Modes: []mapnests.Mode{
+			mapnests.TravelModeCar,
+			mapnests.TravelModeMotorcycle,
+		},
+		Stoppages: []mapnests.ETAStoppage{
+			{
+				Latitude:      23.795,
+				Longitude:     90.41,
+				StoppageOrder: 1,
+			},
+		},
+		TripId: "550e8400-e29b-41d4-a716-446655440000",
+	})
+	if err != nil {
+		return err
+	}
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ ETA Service Response With Geometry (Multi Mode) result:\n" + string(resJSON))
+	return nil
 }

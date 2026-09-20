@@ -12,6 +12,13 @@ This is a **sample Go application** that demonstrates how to use the [Mapnests G
 - ✅ Detailed Search By PlaceId
 - ✅ Pairwise Route Summary
 - ✅ Multi Source Route Summary
+- ✅ Multi Source Route Summary Without Geometry
+- ✅ Snap to Road
+- ✅ Multi Stop Point
+- ✅ ETA With Geometry
+- ✅ ETA With Geometry By Mode
+- ✅ ETA Without Geometry By Mode
+- ✅ ETA Multiple Stoppage
 
 ---
 
