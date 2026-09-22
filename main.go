@@ -47,8 +47,9 @@ func main() {
 	run(ctx, mapClient, "MultiSourceRouteSummaryWithoutGeometry", multiSourceRouteSummaryWithoutGeometryCall)
 	run(ctx, mapClient, "ETA Without Geometry By Modes", etaWithoutGeometryByModesCall)
 	run(ctx, mapClient, "ETA With Geometry By Modes", etaWithGeometryByModesCall)
-	run(ctx, mapClient, "ETA With Geometry", etaWithGeometryCall)
+	run(ctx, mapClient, "ETA WithOut Stoppage", etaWithOutStoppageCall)
 	run(ctx, mapClient, "ETA Multi Stoppage", etaMultipleStoppageCall)
+	run(ctx, mapClient, "Pair Wise Distance Matrix", pairWiseDistanceMatrixCall)
 }
 
 // run prints a header for the named call, executes it, and exits on error.
@@ -274,7 +275,7 @@ func etaWithGeometryByModesCall(ctx context.Context, client mapnests.Client) err
 		FromLon: 90.2792399,
 		ToLat:   23.810332,
 		ToLon:   90.412518,
-		TripId: "550e8400-e29b-41d4-a716-446655440000",
+		TripId:  "550e8400-e29b-41d4-a716-446655440000",
 		Mode:    mapnests.TravelModeCar,
 	})
 	if err != nil {
@@ -285,8 +286,8 @@ func etaWithGeometryByModesCall(ctx context.Context, client mapnests.Client) err
 	return nil
 }
 
-func etaWithGeometryCall(ctx context.Context, client mapnests.Client) error {
-	res, err := client.EtaWithGeometry(ctx, mapnests.ETAsRequest{
+func etaWithOutStoppageCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.EtaWithoutStoppage(ctx, mapnests.ETAsRequest{
 		FromLat: 23.759248321873432,
 		FromLon: 90.41691646513276,
 		ToLat:   23.770148309864418,
@@ -295,38 +296,65 @@ func etaWithGeometryCall(ctx context.Context, client mapnests.Client) error {
 	if err != nil {
 		return err
 	}
-	resJSON, _ := json.MarshalIndent(res, "", "  ")
-	fmt.Println("✅ ETA Service Response With Geometry (Multi Mode) result:\n" + string(resJSON))
+	// Print all data
+	// resJSON, _ := json.MarshalIndent(res, "", "  ")
+	// fmt.Println("✅ ETA Service Response Without Stoppage (Multi Mode) result:\n" + string(resJSON))
+
+	//Print specific mode data
+	cngRouteData := res.Data["cng"]
+	cngRouteDataJson, _:=json.MarshalIndent(cngRouteData, "", "  ")
+	fmt.Println("✅ ETA Service Response Without Stoppage (Multi Mode) result:\n" + string(cngRouteDataJson))
+	
 	return nil
 }
 
 func etaMultipleStoppageCall(ctx context.Context, client mapnests.Client) error {
-	res, err := client.EtaMultiStoppage(ctx, mapnests.ETAMultipleStoppageRequest{
-		Source: mapnests.LatLng{
-			Latitude:  23.8115,
-			Longitude: 90.414,
-		},
-		DropOff: mapnests.LatLng{
-			Latitude:  23.8115,
-			Longitude: 90.414,
-		},
+	req := mapnests.ETAMultipleStoppageRequest{
+		Source:  mapnests.LatLng{Latitude: 23.8115, Longitude: 90.414},
+		DropOff: mapnests.LatLng{Latitude: 23.8115, Longitude: 90.414},
 		Modes: []mapnests.Mode{
 			mapnests.TravelModeCar,
+			mapnests.TravelModeCNG,
 			mapnests.TravelModeMotorcycle,
 		},
 		Stoppages: []mapnests.ETAStoppage{
-			{
-				Latitude:      23.795,
-				Longitude:     90.41,
-				StoppageOrder: 1,
-			},
+			{Latitude: 23.795, Longitude: 90.41, StoppageOrder: 1},
 		},
 		TripId: "550e8400-e29b-41d4-a716-446655440000",
+	}
+
+	res, err := client.EtaMultiStoppage(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	// Dynamic access, driven by whatever modes were requested
+	for _, mode := range req.Modes {
+		modeData, ok := res.Data[mode]
+		if !ok || modeData == nil {
+			continue
+		}
+		modeDataJSON, _ := json.MarshalIndent(modeData, "", "  ")
+		fmt.Printf("Mode: %s\n%s\n", mode, modeDataJSON)
+	}
+
+	return nil
+
+}
+
+func pairWiseDistanceMatrixCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.PairwiseDistanceMatrix(ctx, mapnests.PairwiseDistanceMatrixRequest{
+		Mode: mapnests.TravelModeWalking,
+		Routes: []mapnests.PairwiseDistanceMatrixRoute{
+			{ID: 1, Origin: mapnests.Coordinate{Lat: 23.81183142056928, Lon: 90.41966658048152}, Destination: mapnests.Coordinate{Lat: 23.81011947054907, Lon: 90.42197475156428}},
+			{ID: 2, Origin: mapnests.Coordinate{Lat: 23.81284142056928, Lon: 90.41969658048151}, Destination: mapnests.Coordinate{Lat: 23.81041947054907, Lon: 90.42107475156428}},
+		},
+		Sort: mapnests.SortDistanceInMetresAsc,
 	})
 	if err != nil {
 		return err
 	}
 	resJSON, _ := json.MarshalIndent(res, "", "  ")
-	fmt.Println("✅ ETA Service Response With Geometry (Multi Mode) result:\n" + string(resJSON))
+	fmt.Println("✅ Pairwise Distance Matrix Response result:\n" + string(resJSON))
 	return nil
 }
