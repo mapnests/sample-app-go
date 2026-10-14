@@ -6,8 +6,5 @@ toolchain go1.24.4
 
 require (
 	github.com/joho/godotenv v1.5.1
-	// github.com/mapnests/sdk-go v1.11.10-uat.3
-	github.com/mapnests/sdk-go v1.11.9
+	github.com/mapnests/sdk-go v1.11.10-uat.6
 )
-
-replace github.com/mapnests/sdk-go => /home/tn-99440/Documents/mapBravo/SDK/sdk-go/

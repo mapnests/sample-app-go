@@ -31,25 +31,32 @@ func main() {
 
 	ctx := context.Background()
 
-	// Comment/uncomment the lines below to choose which calls to run.
-	run(ctx, mapClient, "DistanceMatrix", distanceMatrixCall)
-	run(ctx, mapClient, "DistanceMatrixDetails", distanceMatrixDetailsCall)
-	run(ctx, mapClient, "PairwiseRouteSummary", pairwiseRouteSummaryCall)
-	run(ctx, mapClient, "MultiSourceRouteSummary", multiSourceRouteSummaryCall)
+	//------------Geo Map --------------//
 	run(ctx, mapClient, "Search", searchCall)
 	run(ctx, mapClient, "Geocode", geocodeCall)
 	run(ctx, mapClient, "Reverse Geocode", reverseCall)
 	run(ctx, mapClient, "Autocomplete", autocompleteCall)
 	run(ctx, mapClient, "Search By Radius", searchByRadiusCall)
 	run(ctx, mapClient, "Details by Place ID", detailsByPlaceIDCall)
+
+	// //----------Route Map ------------///
+
+	run(ctx, mapClient, "DistanceMatrix", distanceMatrixCall)
+	run(ctx, mapClient, "DistanceMatrixDetails", distanceMatrixDetailsCall)
+	run(ctx, mapClient, "PairwiseRouteSummary", pairwiseRouteSummaryCall)
+	run(ctx, mapClient, "MultiSourceRouteSummary", multiSourceRouteSummaryCall)
 	run(ctx, mapClient, "Snap to Road", snapToRoadCall)
 	run(ctx, mapClient, "MultiStopPoint", multiStopPointCall)
 	run(ctx, mapClient, "MultiSourceRouteSummaryWithoutGeometry", multiSourceRouteSummaryWithoutGeometryCall)
+	run(ctx, mapClient, "Pair Wise Distance Matrix", pairWiseDistanceMatrixCall)
+	run(ctx, mapClient, "MultiStopPoint With Geometry", multiStopPointWithGeometryCall)
+
+	// //-----------ETA-------------
 	run(ctx, mapClient, "ETA Without Geometry By Modes", etaWithoutGeometryByModesCall)
 	run(ctx, mapClient, "ETA With Geometry By Modes", etaWithGeometryByModesCall)
 	run(ctx, mapClient, "ETA WithOut Stoppage", etaWithOutStoppageCall)
 	run(ctx, mapClient, "ETA Multi Stoppage", etaMultipleStoppageCall)
-	run(ctx, mapClient, "Pair Wise Distance Matrix", pairWiseDistanceMatrixCall)
+	
 }
 
 // run prints a header for the named call, executes it, and exits on error.
@@ -121,6 +128,8 @@ func multiSourceRouteSummaryCall(ctx context.Context, client mapnests.Client) er
 	fmt.Println("✅ MultiSourceRouteSummary Response result:\n" + string(resJSON))
 	return nil
 }
+
+
 
 func searchCall(ctx context.Context, client mapnests.Client) error {
 	var limit int64 = 5
@@ -194,7 +203,7 @@ func searchByRadiusCall(ctx context.Context, client mapnests.Client) error {
 
 func detailsByPlaceIDCall(ctx context.Context, client mapnests.Client) error {
 	res, err := client.DetailsByPlaceID(ctx, mapnests.DetailsByPlaceIDRequest{
-		PlaceID: "5f50dd3902085e86d414427a41559222cdfd4d8169378a50ad6659d250601067",
+		PlaceID: "a55cbbb89e9a8f91fe1a08da9665b1811473a8fe020290765418769eaf195155",
 	})
 	if err != nil {
 		return err
@@ -252,7 +261,7 @@ func multiSourceRouteSummaryWithoutGeometryCall(ctx context.Context, client mapn
 }
 
 func etaWithoutGeometryByModesCall(ctx context.Context, client mapnests.Client) error {
-	var numberOfRoutes int64 = 3
+	var numberOfRoutes int64 = 1
 	res, err := client.EtaWithoutGeometryByMode(ctx, mapnests.ETAByModeRequest{
 		FromLat:    23.82440246492232,
 		FromLon:    90.35823219240551,
@@ -356,5 +365,23 @@ func pairWiseDistanceMatrixCall(ctx context.Context, client mapnests.Client) err
 	}
 	resJSON, _ := json.MarshalIndent(res, "", "  ")
 	fmt.Println("✅ Pairwise Distance Matrix Response result:\n" + string(resJSON))
+	return nil
+}
+
+
+func multiStopPointWithGeometryCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.MultiStopPointDetailsWithGeometry(ctx, mapnests.MultiStopPointDetailsWithGeometryRequest{
+		Src: mapnests.Coordinate{Lat: 23.809973415982903, Lon: 90.35697149649764},
+		StopPoints: []mapnests.StopPoint{
+			{ID: 1, Lat: 23.81038738311683, Lon: 90.36203008256733},
+			{ID: 2, Lat: 23.798308134287165, Lon: 90.43522641639149},
+		},
+		Mode: mapnests.TravelModeMotorcycle,
+	})
+	if err != nil {
+		return err
+	}
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ MultiStopPoints with geometry Response result:\n" + string(resJSON))
 	return nil
 }
