@@ -56,10 +56,11 @@ func main() {
 	// run(ctx, mapClient, "ETA With Geometry By Modes", etaWithGeometryByModesCall)
 	// run(ctx, mapClient, "ETA WithOut Stoppage", etaWithOutStoppageCall)
 	// run(ctx, mapClient, "ETA Multi Stoppage", etaMultipleStoppageCall)
+	// run(ctx, mapClient, "ETA With MultiSource MultiStopPoint", etaWithMultiSourceMultiStopPointCall)
 
 	//Static Map
 	run(ctx, mapClient, "Static Map", staticMapCall)
-	
+
 }
 
 // run prints a header for the named call, executes it, and exits on error.
@@ -73,13 +74,12 @@ func run(ctx context.Context, client mapnests.Client, name string, call apiCall)
 func distanceMatrixCall(ctx context.Context, client mapnests.Client) error {
 	traceparent := "00-5b8aa5a2d2c872e8321cf37308d69df2"
 	res, err := client.DistanceMatrix(ctx, mapnests.DistanceMatrixRequest{
-		OriginLat: 23.8103, // Dhaka
-		OriginLon: 90.4125,
-		DestLat:   23.8029, // Chattogram
-		DestLon:   90.4226,
-		Mode:      mapnests.TravelModeCar,
+		OriginLat:   23.8103, // Dhaka
+		OriginLon:   90.4125,
+		DestLat:     23.8029, // Chattogram
+		DestLon:     90.4226,
+		Mode:        mapnests.TravelModeCar,
 		Traceparent: &traceparent,
-
 	})
 	if err != nil {
 		return err
@@ -134,8 +134,6 @@ func multiSourceRouteSummaryCall(ctx context.Context, client mapnests.Client) er
 	fmt.Println("✅ MultiSourceRouteSummary Response result:\n" + string(resJSON))
 	return nil
 }
-
-
 
 func searchCall(ctx context.Context, client mapnests.Client) error {
 	var limit int64 = 5
@@ -311,15 +309,10 @@ func etaWithOutStoppageCall(ctx context.Context, client mapnests.Client) error {
 	if err != nil {
 		return err
 	}
-	// Print all data
-	// resJSON, _ := json.MarshalIndent(res, "", "  ")
-	// fmt.Println("✅ ETA Service Response Without Stoppage (Multi Mode) result:\n" + string(resJSON))
-
-	//Print specific mode data
 	cngRouteData := res.Data["cng"]
-	cngRouteDataJson, _:=json.MarshalIndent(cngRouteData, "", "  ")
+	cngRouteDataJson, _ := json.MarshalIndent(cngRouteData, "", "  ")
 	fmt.Println("✅ ETA Service Response Without Stoppage (Multi Mode) result:\n" + string(cngRouteDataJson))
-	
+
 	return nil
 }
 
@@ -374,7 +367,6 @@ func pairWiseDistanceMatrixCall(ctx context.Context, client mapnests.Client) err
 	return nil
 }
 
-
 func multiStopPointWithGeometryCall(ctx context.Context, client mapnests.Client) error {
 	res, err := client.MultiStopPointDetailsWithGeometry(ctx, mapnests.MultiStopPointDetailsWithGeometryRequest{
 		Src: mapnests.Coordinate{Lat: 23.809973415982903, Lon: 90.35697149649764},
@@ -392,8 +384,33 @@ func multiStopPointWithGeometryCall(ctx context.Context, client mapnests.Client)
 	return nil
 }
 
+func etaWithMultiSourceMultiStopPointCall(ctx context.Context, client mapnests.Client) error {
+	res, err := client.EtaWithMultiSourceMultiStopPoint(ctx, mapnests.EtaWithMultiSourceMultiStopPointRequest{
+		PickupPoint: mapnests.Coordinate{Lat: 23.809973415982903, Lon: 90.35697149649764},
+		Riders: []mapnests.EtaWithMultiSourceMultiStopPointRider{
+			{
+				RiderID:         "rider-1",
+				CurrentLocation: mapnests.Coordinate{Lat: 23.81038738311683, Lon: 90.36203008256733},
+				DropOffPoint:    mapnests.Coordinate{Lat: 23.798308134287165, Lon: 90.43522641639149},
+			},
+			{
+				RiderID:         "rider-2",
+				CurrentLocation: mapnests.Coordinate{Lat: 23.770348, Lon: 90.407785},
+				DropOffPoint:    mapnests.Coordinate{Lat: 23.794249, Lon: 90.414536},
+			},
+		},
+		Mode: mapnests.TravelModeMotorcycle,
+	})
+	if err != nil {
+		return err
+	}
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ ETA With MultiSource MultiStopPoint Response result:\n" + string(resJSON))
+	return nil
+}
+
 func staticMapCall(ctx context.Context, client mapnests.Client) error {
-	
+
 	res, err := client.StaticMap(ctx, mapnests.StaticMapRequest{
 		Polyline: "amyil@uu`mkDqEdi@sFvcAyCX|Ju~Ah@_H~C_^bC{\\~Go_An@wIdA}NvBoWH_DEsAKuA{@gDaB_EYg@sAkBeAcAqAcA}DaBcN}D}YoIaCwA_DkBsD_EiB{CyBqF{CaIwE}QcIuYmVqv@wLmb@oNgb@qK_[_D{HsCcGyEkH_EkEy@u@eE_E}FcEiAy@gGsCcM}CiOqBqNuBo`@iCyf@wCcpA}GqsAaIeEYwTuAmr@sDkUgAmHc@mEi@kEBeQtA}Cn@gPfEeGd@kb@oAmg@{C_ViAow@mEu]cCoV_Age@T_ORmQTaw@tAeU`@oCHgIv@ePpAw]zDeX`Eyc@nF{Y|Dkr@bLoAToMtCsKtCcQtEaM~Bk[lIi\\`JuAXguA|_@oSbFge@dNgFxA_OdE_MjLwEbEiCeGcCmGmByFcIi\\gEwV}a@uvByJkr@cHu\\{IwYqIc]yB}Jg@Ec@UW[Qa@Ee@@g@mGoToJo\\gBaIeOwi@qBoKeBiJuBkLaBwKaDqTsGck@m@aFa@_Coi@bGql@bKmdAxJqgDpc@kpBfWuFt@c[~D}X|Ce[vCmf@~D_]jC{T~BgVvBuYtBiNz@gQJqOf@oIXiB@s|@d@}oAjCuEReBBiFHqEFm@BwqArD{RBqFC{b@AsJ@uzA`@a[Ass@jAkR~@aUdCsPtB_LdBiHdBmK`EmM|E_QjGqNnFuFtBeL~E}QlGgCzA}PxIeDdBaD|AmCbA{F|@_CNwBKyBi@uCkAeCcAmDyB}BsAaLaIgWgQuCcByCyAgL{E_C_Ai@UwBgA_R{FsLwDyKuCuQ}DyIsAiJgA}Ei@iEg@yJc@uHYaIO{HYeCG}Is@}C}@uBaA{CaBwBiBsA}AiAyBQ}DOmCFkCT{Aj@mBz@_BlBgBdBcAnBg@rAK|AOrA\\jC|@lDxCpDjCpAhArBnApCtAvClAjD|@lDf@fZnAvu@zApOh@dLt@nE`@rJ\\|Gj@~Q~EhKhCnTzEzFrBxN~EtHvCjH~DhD~BxDbF|B~B~AxBtBrBzAx@rCNp@BzB@fLyAvGuAtFeBjPuF|VeKbJcDpNaEnLsBhDu@zHoAfHgAlJw@nOm@nRk@hVUpc@f@b@A",
 		Markers: []mapnests.Coordinate{
@@ -401,14 +418,12 @@ func staticMapCall(ctx context.Context, client mapnests.Client) error {
 			{Lat: 23.794249, Lon: 90.414536},
 			{Lat: 23.816310, Lon: 90.421117},
 		},
-		
+
 	})
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile("static_map.png", res.Image, 0o644); err != nil {
-		return err
-	}
-	fmt.Printf("✅ Static Map saved to static_map.png (%d bytes), distance: %.2f m\n", len(res.Image), res.DistanceMeters)
+	resJSON, _ := json.MarshalIndent(res, "", "  ")
+	fmt.Println("✅ Static Map Response result:\n" + string(resJSON))
 	return nil
 }
