@@ -56,10 +56,10 @@ func main() {
 	// run(ctx, mapClient, "ETA With Geometry By Modes", etaWithGeometryByModesCall)
 	// run(ctx, mapClient, "ETA WithOut Stoppage", etaWithOutStoppageCall)
 	// run(ctx, mapClient, "ETA Multi Stoppage", etaMultipleStoppageCall)
-	// run(ctx, mapClient, "ETA With MultiSource MultiStopPoint", etaWithMultiSourceMultiStopPointCall)
+	run(ctx, mapClient, "ETA With MultiSource MultiStopPoint", etaWithMultiSourceMultiStopPointCall)
 
 	//Static Map
-	run(ctx, mapClient, "Static Map", staticMapCall)
+	// run(ctx, mapClient, "Static Map", staticMapCall)
 
 }
 
